@@ -40,9 +40,13 @@ Table of contents
 # 介紹
 紀錄 ElasticSearch Cluster + Kafka  + Logstash 整合過程
 
+<br>
+
 # 架構圖
 
 ![architecture](img/architecture.png)
+
+<br>
 
 # 系統版本
 
@@ -51,7 +55,11 @@ Table of contents
 - Elasticsearch ：`8.4.2`
 - Kafka ：`kafka_2.13-3.2.0`
 
+<br>
+
 # 機器規格
+
+<br>
 
 ## Elasticsearch Cluster
 
@@ -69,6 +77,8 @@ Table of contents
 | fet-es-data05.pf | 10.64.5.110 | 8 | 64 | 200 |  |
 | fet-es-data06.pf | 10.64.5.111 | 8 | 64 | 200 |  |
 
+<br>
+
 ## Kafka Cluster
 
 Kafka 機器磁碟空間需要較大  , 因日誌會儲存在Kafka內等消費者進行消化傳送至Elasticsearch 
@@ -81,6 +91,8 @@ Kafka 機器磁碟空間需要較大  , 因日誌會儲存在Kafka內等消費�
 | fet-es-kfk02.pf | 10.64.5.116 | 4 | 8 | 200 | kafka + zookeeper |
 | fet-es-kfk03.pf | 10.64.5.117 | 4 | 8 | 200 | kafka + zookeeper |
 
+<br>
+
 ## Consumer Group
 
 | hostname | IP | CPU | Memory | Disk (LVM) | 備註 |
@@ -89,7 +101,11 @@ Kafka 機器磁碟空間需要較大  , 因日誌會儲存在Kafka內等消費�
 | fet-es-kfk-consumer02.pf | 10.64.5.122 | 4 | 8 | 30 | logstash |
 | fet-es-kfk-consumer03.pf | 10.64.5.123 | 4 | 8 | 30 | logstash |
 
+<br>
+
 # 部署服務
+
+<br>
 
 ## 事前準備
 
@@ -124,9 +140,13 @@ CoreDNS 設定
 /coredns/nexiosoft/pf/fet-es-kfk-consumer03 {"host": "10.64.5.123", "ttl": 60}
 ```
 
+<br>
+
 ## Elasticsearch Cluster
 
 [https://learnku.com/articles/40718](https://learnku.com/articles/40718)
+
+<br>
 
 ### 設置LVM
 
@@ -150,6 +170,8 @@ root@ubuntu:~# echo "/dev/mapper/data-data     /data        ext4    defaults 0 1
 
 ```
 
+<br>
+
 ### 安裝
 
 在所有 Elasticsearch 節點中下載檔案以及安裝
@@ -158,6 +180,8 @@ root@ubuntu:~# echo "/dev/mapper/data-data     /data        ext4    defaults 0 1
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.4.2-amd64.deb
 dpkg -i elasticsearch-8.4.2-amd64.deb
 ```
+
+<br>
 
 ### 修改配置
 
@@ -577,11 +601,17 @@ xpack.security.http.ssl.enabled: false
 
 ```
 
+<br>
+
 ### 驗證
 
 使用 elasticvue 連線 coordinating , 如果能看到節點資訊表示cluster已經建立完成
 
+<br>
+
 ## Kibana
+
+<br>
 
 ### 安裝
 
@@ -589,6 +619,8 @@ xpack.security.http.ssl.enabled: false
 wget https://artifacts.elastic.co/downloads/kibana/kibana-8.4.2-amd64.deb
 dpkg -i kibana-8.4.2-amd64.deb
 ```
+
+<br>
 
 ### 修改配置
 
@@ -612,15 +644,21 @@ logging:
 pid.file: /run/kibana/kibana.pid
 ```
 
+<br>
+
 ### 啟動服務及開機啟動
 
 ```bash
 systemctl enable kibana.service --now
 ```
 
+<br>
+
 ## Kafka Cluster
 
 參考文章: [https://acloudguru.com/hands-on-labs/installing-a-kafka-cluster-and-creating-a-topic](https://acloudguru.com/hands-on-labs/installing-a-kafka-cluster-and-creating-a-topic)
+
+<br>
 
 ### 設置LVM
 
@@ -641,6 +679,8 @@ root@ubuntu:~# echo "/dev/mapper/data-data     /data        ext4    defaults 0 1
 
 ```
 
+<br>
+
 ### 安裝
 
 ```bash
@@ -652,6 +692,8 @@ tar -xvf kafka_2.13-3.2.0.tgz
 mv kafka_2.13-3.2.0 kafka
 mv kafka /opt
 ```
+
+<br>
 
 ### 配置
 
@@ -898,12 +940,16 @@ WantedBy=multi-user.target
 EOF
 ```
 
+<br>
+
 ### 服務啟動及開機啟動
 
 ```bash
 systemctl enable zookeeper --now
 systemctl enable kafka --now
 ```
+
+<br>
 
 ### 驗證
 
@@ -922,6 +968,8 @@ export JAVA_HOME=/usr/java/openjdk15
 # 消費消息
 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server fet-es-kfk01.pf:9092,fet-es-kfk02.pf:9092,fet-es-kfk03.pf:9092 --topic test
 ```
+
+<br>
 
 ### 常用指令
 
@@ -947,13 +995,19 @@ export JAVA_HOME=/usr/java/openjdk15
 /opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server fet-es-kfk01.pf:9092,fet-es-kfk02.pf:9092,fet-es-kfk03.pf:9092  --describe --group <group名稱>
 ```
 
+<br>
+
 ## Kafka Eagle (Kafka Web介面)
 
 Kafka eagle為Kafka監控及可視化工具 , 但測試狀況有許多問題 , 目前優先級不高 ,  待未來再研究
 
+<br>
+
 ## Kafka Producer
 
 此處使用 td-agent 服務作為 Kafka 的 Producer 
+
+<br>
 
 ### 配置
 
@@ -1040,9 +1094,13 @@ Kafka eagle為Kafka監控及可視化工具 , 但測試狀況有許多問題 , �
 </label>
 ```
 
+<br>
+
 ## Kafka Consumer
 
 此處使用 `Logstash` 服務作為 Kafka 的 Consumer
+
+<br>
 
 ### 安裝
 
@@ -1050,6 +1108,8 @@ Kafka eagle為Kafka監控及可視化工具 , 但測試狀況有許多問題 , �
 wget https://artifacts.elastic.co/downloads/logstash/logstash-8.4.2-amd64.deb
 dpkg -i logstash-8.4.2-amd64.deb
 ```
+
+<br>
 
 ### 配置
 
@@ -1110,11 +1170,15 @@ output{
 }
 ```
 
+<br>
+
 ### 啟動服務＆開機啟動
 
 ```bash
 systemctl enable logstash.service --now
 ```
+
+<br>
 
 ### 驗證
 
@@ -1124,6 +1188,8 @@ journalctl -u logstash.service -f
 ```
 
 ![verification](img/verification.png)
+
+<br>
 
 # 驗證
 
@@ -1150,6 +1216,8 @@ Elasticsearch cluster 、 Kafka cluster 及負責消費的logstash 都架設完�
 | --record-size | 指定每條消息的大小，單位是字節，和--payload-file 兩個中必須指定一個，但不能同時指定 |
 | --payload-file | 指定消息的來源文件，只支持UTF-8 編碼的文本文件，文件的消息分隔符通過--payload-delimeter 指定，和--record-size 兩個中必須指定一個，但不能同時指定 |
 
+<br>
+
 # Reference
 
 ---
@@ -1159,3 +1227,6 @@ Elasticsearch cluster 、 Kafka cluster 及負責消費的logstash 都架設完�
 [https://www.readfog.com/a/1668730672433434624](https://www.readfog.com/a/1668730672433434624)
 
 [https://www.cnblogs.com/lkxed/p/kafka-perf-test-tools.html](https://www.cnblogs.com/lkxed/p/kafka-perf-test-tools.html)
+
+
+<br>
